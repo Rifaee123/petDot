@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "308756769683",
+    "project_id": "petdot-fc57e",
+    "storage_bucket": "petdot-fc57e.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:308756769683:android:fec5e80804b8cf9ec19666",
+        "android_client_info": {
+          "package_name": "com.example.petdot"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "308756769683-qo10t1hj0hkbosma69pckpmkgb7k6sk4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBZNEqsvCeJNPL2Cmj4024DFdzK22cZTMI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "308756769683-qo10t1hj0hkbosma69pckpmkgb7k6sk4.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
