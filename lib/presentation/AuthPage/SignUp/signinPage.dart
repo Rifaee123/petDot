@@ -8,6 +8,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:petdot/presentation/AuthPage/CommonPage/appAbout.dart';
 
 import 'package:petdot/presentation/AuthPage/Login/loginpage.dart';
+import 'package:petdot/presentation/AuthPage/email_verification.dart';
 
 class SignInSignUpPage extends StatefulWidget {
   @override
@@ -282,24 +283,24 @@ class _SignInSignUpPageState extends State<SignInSignUpPage>
                                         "assets/images/icons8-google-48.png"),
                                   ))),
                             ),
-                            Container(
-                                width: 155.w,
-                                height: 40.h,
-                                decoration: BoxDecoration(
-                                    image: DecorationImage(
-                                  fit: BoxFit.fill,
-                                  image: AssetImage(
-                                      "assets/images/icons8-facebook-48.png"),
-                                ))),
-                            Container(
-                                width: 155.w,
-                                height: 40.h,
-                                decoration: BoxDecoration(
-                                    image: DecorationImage(
-                                  fit: BoxFit.fill,
-                                  image: AssetImage(
-                                      "assets/images/icons8-twitter-48.png"),
-                                ))),
+                            // Container(
+                            //     width: 155.w,
+                            //     height: 40.h,
+                            //     decoration: BoxDecoration(
+                            //         image: DecorationImage(
+                            //       fit: BoxFit.fill,
+                            //       image: AssetImage(
+                            //           "assets/images/icons8-facebook-48.png"),
+                            //     ))),
+                            // Container(
+                            //     width: 155.w,
+                            //     height: 40.h,
+                            //     decoration: BoxDecoration(
+                            //         image: DecorationImage(
+                            //       fit: BoxFit.fill,
+                            //       image: AssetImage(
+                            //           "assets/images/icons8-twitter-48.png"),
+                            //     ))),
                           ]),
                     ],
                   ),
@@ -372,10 +373,12 @@ class _SignInSignUpPageState extends State<SignInSignUpPage>
             .doc(FirebaseAuth.instance.currentUser!.email)
             .collection(userId)
             .add(userData)
-            .then((value) =>
-                Navigator.of(context).pushReplacement(MaterialPageRoute(
-                  builder: (context) => AppAboutPage(),
-                )));
+            .then((value) {
+          userCredentiol.user!.sendEmailVerification().then((value) =>
+              Navigator.of(context).pushReplacement(MaterialPageRoute(
+                builder: (context) => EmailVerfication(),
+              )));
+        });
       }
 
       print('User registered successfully!');

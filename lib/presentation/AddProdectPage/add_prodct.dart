@@ -1,15 +1,18 @@
 import 'dart:developer';
 import 'dart:io';
-
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:path/path.dart' as path1;
 import 'package:flutter_geocoder/geocoder.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:petdot/models/pet_details_model.dart';
+import 'package:petdot/presentation/AddProdectPage/animated_product.dart';
 import 'package:petdot/presentation/AddProdectPage/imageslist.dart';
 import 'package:petdot/presentation/HomePage/location_screen/location_page.dart';
 
@@ -36,7 +39,7 @@ class _AddProdectPageState extends State<AddProdectPage> {
     final refrnce = user
         .doc(FirebaseAuth.instance.currentUser!.email)
         .collection('products');
-    refrnce.doc(refrnce.id).set({
+    refrnce.doc().set({
       'price': petData.price,
       'images': downloadURLs,
       'productname': petData.petname,
@@ -47,6 +50,7 @@ class _AddProdectPageState extends State<AddProdectPage> {
       'description': petData.discription,
       'ownerId': FirebaseAuth.instance.currentUser!.displayName,
       'state': stateproduct,
+      'breed': breadcontroller.text.trim()
     });
 
     FirebaseFirestore.instance.collection('allproducts').add({
@@ -60,9 +64,44 @@ class _AddProdectPageState extends State<AddProdectPage> {
       'description': petData.discription,
       'ownerId': FirebaseAuth.instance.currentUser!.displayName,
       'state': stateproduct,
+      'breed': breadcontroller.text.trim()
     });
   }
 
+  Future<void> uploadImagesToFirebase(
+      List<String> imagePaths, BuildContext context) async {
+    final firebase_storage.FirebaseStorage storage =
+        firebase_storage.FirebaseStorage.instance;
+    final firebase_storage.Reference storageRef = storage.ref();
+
+    for (String imagePath in imagePaths) {
+      final file = File(imagePath);
+      final fileName = path1.basename(file.path);
+      final firebase_storage.Reference imageRef = storageRef.child(fileName);
+
+      try {
+        await imageRef.putFile(file);
+        final downloadURL = await imageRef.getDownloadURL();
+        downloadURLs.add(downloadURL);
+      } catch (error) {
+        final snackBar =
+            SnackBar(content: Text('Failed to upload image: $error'));
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      }
+    }
+
+    // You can use downloadURLs as needed, for example, you can update the Firestore document with the download URLs.
+    // For demonstration purposes, let's just print the download URLs.
+    downloadURLs.forEach((url) => print('Download URL: $url'));
+  }
+
+  void removeImageAtIndex(int index) {
+    setState(() {
+      imagelist.removeAt(index);
+    });
+  }
+
+  final CarouselController _controller = CarouselController();
   @override
   Widget build(BuildContext context) {
     setState(() {
@@ -98,33 +137,91 @@ class _AddProdectPageState extends State<AddProdectPage> {
                   ],
                 ),
               ),
-              Stack(children: [
-                CircleAvatar(
-                  radius: 90,
-                  backgroundImage: imagePath == null
-                      ? AssetImage(
-                          'assets/images/martina-round-icon-with-a-person.gif',
-                        ) as ImageProvider
-                      : FileImage(File(imagePath!)),
+              // Stack(children: [
+              //   CircleAvatar(
+              //     radius: 90,
+              //     backgroundImage: imagePath == null
+              //         ? AssetImage(
+              //             'assets/images/martina-round-icon-with-a-person.gif',
+              //           ) as ImageProvider
+              //         : FileImage(File(imagePath!)),
+              //   ),
+              //   Positioned(
+              //       bottom: 20,
+              //       right: 10,
+              //       child: Container(
+              //           width: 360.w,
+              //           decoration: BoxDecoration(
+              //               color: Colors.white,
+              //               borderRadius:
+              //                   BorderRadius.all(Radius.circular(30))),
+              //           child: InkWell(
+              //               onTap: () {
+              //                 Navigator.of(context).push(MaterialPageRoute(
+              //                   builder: (context) => ImagesList(),
+              //                 ));
+              //               },
+              //               child: Image.asset(
+              //                   "assets/images/icons8-photos-50.png"))))
+              // ]),
+              CarouselSlider.builder(
+                itemCount: imagelist.length,
+                itemBuilder: (BuildContext context, int index, int realIndex) {
+                  return Container(
+                    // width: MediaQuery.of(context).size.width,
+                    margin: EdgeInsets.symmetric(horizontal: 5.0),
+                    child: Stack(
+                      children: [
+                        Image(
+                          image: FileImage(File(imagelist[index])),
+                        ),
+                        SizedBox(
+                          height: 20.h,
+                        ),
+                        Positioned(
+                          bottom: 0,
+                          right: 0,
+                          child: CircleAvatar(
+                            backgroundColor: Color(0xff95f8e4),
+                            child: IconButton(
+                              onPressed: () {
+                                removeImageAtIndex(index);
+                              },
+                              icon: Icon(
+                                Icons.delete,
+                                color: Colors.red,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+                carouselController: _controller,
+                options: CarouselOptions(
+                  enableInfiniteScroll: false,
+                  autoPlay: false,
+                  enlargeCenterPage: true,
+                  viewportFraction: 0.9,
+                  aspectRatio: 2.0,
+                  initialPage: 1,
                 ),
-                Positioned(
-                    bottom: 20,
-                    right: 10,
-                    child: Container(
-                        width: 360.w,
-                        decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(30))),
-                        child: InkWell(
-                            onTap: () {
-                              Navigator.of(context).push(MaterialPageRoute(
-                                builder: (context) => ImagesList(),
-                              ));
-                            },
-                            child: Image.asset(
-                                "assets/images/icons8-photos-50.png"))))
-              ]),
+              ),
+              ElevatedButton(
+                  style: ButtonStyle(
+                      backgroundColor: MaterialStateColor.resolveWith(
+                          (states) => Color(0xff95f8e4))),
+                  onPressed: () {
+                    takePhoto().then((value) {
+                      if (imagelist.length < 4) {
+                        imagelist.add(imagePath!);
+                        uploadImagesToFirebase(imagelist, context);
+                      }
+                    });
+                  },
+                  child: Text('Add Image')),
+
               Text(
                 "*Minimum 4 images Required",
               ),
@@ -343,6 +440,7 @@ class _AddProdectPageState extends State<AddProdectPage> {
                   ),
                   onPressed: () async {
                     print(downloadURLs.length);
+
                     if (downloadURLs.length > 3) {
                       return addData(PetModel(
                               address: featuname,
@@ -356,6 +454,9 @@ class _AddProdectPageState extends State<AddProdectPage> {
                         setState(() {});
                         imagelist.clear();
                         downloadURLs.clear();
+                        Navigator.of(context).pushReplacement(MaterialPageRoute(
+                          builder: (context) => AddScreen(),
+                        ));
                       });
                     } else {
                       return showDialog(
@@ -457,6 +558,17 @@ class _AddProdectPageState extends State<AddProdectPage> {
 
     print(
         "${addresslocation} : ad${first.addressLine}ad :${contrynamelocation}");
+  }
+
+  Future<void> takePhoto() async {
+    final pickedFile =
+        await ImagePicker().pickImage(source: ImageSource.gallery);
+
+    if (pickedFile != null) {
+      setState(() {
+        imagePath = pickedFile.path;
+      });
+    }
   }
 }
 

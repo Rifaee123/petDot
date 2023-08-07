@@ -29,14 +29,16 @@ environment:
 # versions available, run `flutter pub outdated`.
 dependencies:
   awesome_dialog: ^3.1.0
+  carousel_slider: ^4.2.1
   cloud_firestore: ^4.8.3
+  csc_picker: 
   cupertino_icons: ^1.0.2
   firebase_auth: ^4.6.3
   firebase_core: ^2.14.0
   firebase_storage: ^11.2.5
   flutter:
     sdk: flutter
-  flutter_carousel_slider: ^1.1.0
+  
   flutter_geocoder: ^0.2.2-nullsafety
   flutter_screen_lock: ^9.0.1
   flutter_screenutil: ^5.8.4
@@ -45,6 +47,7 @@ dependencies:
   google_nav_bar: ^5.0.6
   google_sign_in: ^6.1.4
   image_picker: ^1.0.1
+  open_mail_app: ^0.4.5
   path: ^1.8.3
   url_launcher: ^6.1.12
 
